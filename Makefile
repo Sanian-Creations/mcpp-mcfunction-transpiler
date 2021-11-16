@@ -5,9 +5,9 @@ CC := gcc
 src_dir := src
 obj_dir := obj
 build_dir := build
-test_dir := tests
-test_obj_dir := $(obj_dir)/$(test_dir)
-test_src_dir := $(src_dir)/$(test_dir)
+test_src_dir := $(src_dir)/tests
+test_obj_dir := $(obj_dir)/tests
+dirs := $(src_dir) $(obj_dir) $(build_dir) $(test_src_dir) $(test_obj_dir)
 target_exec := $(build_dir)/mcpp.exe
 test_exec := $(build_dir)/runtests.exe
 
@@ -19,7 +19,7 @@ objects_without_entrypoint := $(filter-out $(obj_dir)/entrypoint.o, $(objects)) 
 
 
 # main stuff
-$(target_exec): $(objects)
+$(target_exec): $(dirs) $(objects)
 	$(CC) $(objects) -o $@
 
 $(obj_dir)/%.o: $(src_dir)/%.c $(src_dir)/%.h
@@ -28,8 +28,11 @@ $(obj_dir)/%.o: $(src_dir)/%.c $(src_dir)/%.h
 $(obj_dir)/%.o: $(src_dir)/%.c
 	$(CC) $< -c -o $@
 
+$(dirs):
+	-mkdir $@
+
 # test stuff
-$(test_exec): $(src_objects) $(test_objects)
+$(test_exec): $(dirs) $(objects) $(test_objects)
 	$(CC) $(test_objects) $(objects_without_entrypoint) -o $@
 
 $(test_obj_dir)/%.o: $(test_src_dir)/%.c $(test_src_dir)/%.h
@@ -50,7 +53,7 @@ rebuild: clean $(target_exec)
 run: $(target_exec)
 	"$(target_exec)" inputfiles/input.mcpp
 
-objects: $(objects) # just makes the object files without making the executable
+objects: $(dirs) $(objects) # just makes the object files without making the executable
 
 tests: $(test_exec)
 
