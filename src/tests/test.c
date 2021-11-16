@@ -1,4 +1,5 @@
-#include "../src/main.h"
+#include "../lexer.h"
+#include "../main.h"
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>

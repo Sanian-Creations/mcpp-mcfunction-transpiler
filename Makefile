@@ -5,17 +5,17 @@ CC := gcc
 src_dir := src
 obj_dir := obj
 build_dir := build
-target_exec := $(build_dir)/output.exe
+test_dir := tests
+test_obj_dir := $(obj_dir)/$(test_dir)
+test_src_dir := $(src_dir)/$(test_dir)
+target_exec := $(build_dir)/mcpp.exe
+test_exec := $(build_dir)/runtests.exe
 
 sources := $(wildcard $(src_dir)/*.c)
-names := $(notdir $(basename $(sources)))
-objects := $(addprefix $(obj_dir)/, $(addsuffix .o, $(names)))
-
-test_dir := tests
-test_exec := $(test_dir)/tests.exe
-test_sources := $(wildcard $(test_dir)/*.c)
-test_objects := $(addprefix $(obj_dir)/, $(test_sources:.c=.o)) # will be obj/tests/file.o
-objects_without_entrypoint := $(filter-out $(obj_dir)/entrypoint.o, $(objects))
+objects := $(addprefix $(obj_dir)/, $(notdir $(sources:.c=.o)))
+test_sources := $(wildcard $(test_src_dir)/*.c)
+test_objects := $(addprefix $(test_obj_dir)/, $(notdir $(test_sources:.c=.o))) # will be obj/tests/file.o
+objects_without_entrypoint := $(filter-out $(obj_dir)/entrypoint.o, $(objects)) # all src objects, but without the entrypoint
 
 
 # main stuff
@@ -32,10 +32,10 @@ $(obj_dir)/%.o: $(src_dir)/%.c
 $(test_exec): $(src_objects) $(test_objects)
 	$(CC) $(test_objects) $(objects_without_entrypoint) -o $@
 
-$(obj_dir)/$(test_dir)/%.o: $(test_dir)/%.c $(test_dir)/%.h
+$(test_obj_dir)/%.o: $(test_src_dir)/%.c $(test_src_dir)/%.h
 	$(CC) $< -c -o $@
 
-$(obj_dir)/$(test_dir)/%.o: $(test_dir)/%.c
+$(test_obj_dir)/%.o: $(test_src_dir)/%.c
 	$(CC) $< -c -o $@
 
 # make commands
@@ -43,6 +43,7 @@ $(obj_dir)/$(test_dir)/%.o: $(test_dir)/%.c
 
 clean:
 	-rm $(obj_dir)/*.o
+	-rm $(target_exec)
 
 rebuild: clean $(target_exec)
 
@@ -57,4 +58,5 @@ runtests: tests
 	$(test_exec)
 
 cleantests:
-	-rm $(obj_dir)/$(test_dir)/*.o
+	-rm $(test_obj_dir)/*.o
+	-rm $(test_exec)
