@@ -1,5 +1,6 @@
 #include "../lexer.h"
 #include "../main.h"
+#include "../datastructures.h"
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
@@ -8,12 +9,76 @@ int tests_run;
 int tests_failed;
 
 #define TEST_START tests_run++
-#define FAIL tests_failed++
-
+#define FAIL(a, ...) do{tests_failed++;printf("[%d] "a"\n",tests_run,##__VA_ARGS__);return;}while(0)
 
 // static keyword means this function is only available from within this file
 // if it is #included elsewhere this function cannot be called.
 
+// TODO write some tests for datalist, similar to pointerList;
+
+
+
+static void test_pointerList_add_shouldResize(size_t initialCapacity) {
+  TEST_START;
+  
+  int kek = 101;
+  pointerList_T list;
+  pointerList_init(&list, initialCapacity);
+  list.len = initialCapacity;
+  pointerList_add(&list, &kek);
+
+  if (list.capacity != initialCapacity*2) {
+    pointerList_dispose(&list);
+    FAIL("pointerList_add: Capacity should be %d after resizing from %d", initialCapacity*2, initialCapacity);
+  }
+  pointerList_dispose(&list);
+}
+
+static void test_pointerList_add() {
+  TEST_START;
+
+  int kek = 101;
+  pointerList_T list;
+  pointerList_init(&list, 2);
+  pointerList_add(&list, &kek);
+  
+  if (list.arr == NULL) {
+    pointerList_dispose(&list);
+    FAIL("pointerList_add: list.arr shouldn't be NULL after inserting one item");
+  }
+  if (list.arr[0] != &kek) {
+    pointerList_dispose(&list);
+    FAIL("pointerList_add: the added value should be in the array");
+  }
+  if (list.len != 1) {
+    pointerList_dispose(&list);
+    FAIL("pointerList_add: len should be 1 after adding a single value");
+  }
+  pointerList_dispose(&list);
+}
+
+static void test_pointerList_0capacity() {
+  TEST_START;
+
+  pointerList_T list;
+  list.arr = (void*)0xFFFFFFFF; // some non-null pointer
+  
+  pointerList_init(&list, 0);
+  
+  if (list.arr != NULL) {
+    pointerList_dispose(&list);
+    FAIL("pointerList_init: 0 capacity should set 'arr' to NULL");
+  }
+  pointerList_dispose(&list);
+}
+
+static void test_pointerList() {
+  test_pointerList_0capacity();
+  test_pointerList_add();
+  test_pointerList_add_shouldResize(2);
+  test_pointerList_add_shouldResize(5);
+  test_pointerList_add_shouldResize(69);
+}
 
 
 static void test_parseArgs_(int argc, char** args, bool shouldSucceed) {
@@ -27,11 +92,10 @@ static void test_parseArgs_(int argc, char** args, bool shouldSucceed) {
   bool succeeded = error == 0;
 
   if (succeeded != shouldSucceed){
-    FAIL;
     if (shouldSucceed) {
-      fprintf(stdout, "parseArgs: should succeed when given %d argument(s), instead it gave this error: \n\t%s\n", argc, error);
+      FAIL("parseArgs: should succeed when given %d argument(s), instead it gave this error: \n\t%s", argc, error);
     } else { 
-      fprintf(stdout, "parseArgs: should not succeed when given %d argument(s)\n", argc);
+      FAIL("parseArgs: should not succeed when given %d argument(s)", argc);
     }
   }
 }
@@ -47,29 +111,11 @@ static void test_parseArgs() {
 }
 
 
-static void test_strEq_(char* arg1, char* arg2, bool expected) {
-  TEST_START;
 
-  bool result = strEq(arg1, arg2);
-
-  if (result != expected) {
-    FAIL;
-    fprintf(stdout, "strEq: |%s| should %sbe equal to |%s|\n", arg1, expected ? "" : "not ", arg2);
-  }
-}
-
-static void test_strEq(){  
-  test_strEq_("yo", "yo", true);
-  test_strEq_("", "", true);
-  test_strEq_("abc", "bca", false);
-  test_strEq_("abc", "abd", false);
-}
-
-
-int main(int argc, char** args) {
-  test_strEq();
+int main() {
   test_parseArgs();
+  test_pointerList();
   
-  fflush(stdout);  
-  fprintf(stderr, "RESULT: [%d/%d] tests succeeded.\n", tests_run - tests_failed, tests_run);
+  printf("RESULT: [%d/%d] tests succeeded.\n", tests_run - tests_failed, tests_run);
+  fflush(stdout);
 }

@@ -1,0 +1,93 @@
+--------------
+Syntax of MC++
+--------------
+
+Comments.
+
+	// line comment
+	
+	/*
+	block comment
+	contains loads of stuff
+	*/
+
+
+At the top of each file, define the namespace.
+
+	namespace "something";
+	
+
+Functions are defined with the keyword 'function' followed by the name of the function.
+
+	function something {
+
+	}
+
+
+Keyword '#load' adds this function to the load function tag.
+
+	#load function main {
+	
+	}
+
+
+Keyword '#tick' adds this function to the tick function tag.
+
+	#tick function init {
+	
+	}
+
+
+Keywords can be stacked but you probably shouldn't do that.
+
+Manually write commands by starting a line with '/'.
+A line still needs to end with ';' because this allows multi-line commands which can make readability much better.
+
+	/execute as @a[tag=lmao] at @s
+	  if entity @e[type=armor_stand,distance=..5]
+	  if score @s temp matches 69
+	  store result score NAME OBJECTIVE
+	  run say "yoyoyo";
+
+
+Alternatively, a 'raw' block pastes its content directly into the resulting files.
+It's content isn't checked, so if you make a mistake you'll have to figure that out yourself!
+
+	@{
+		say hi
+		tellraw @a "yoyoyo!"
+		# mcfunction comment
+		scoreboard players set @s temp 69
+	}@
+
+
+Single line if statements can be made
+
+	if (x) /say hi;
+
+
+Block if-statements can be made
+
+	if (x) {
+		//...
+	}
+
+
+Else is also supported
+
+	if (x) {
+		//...
+	} else {
+		//...
+	}
+
+
+Create loops
+
+	while (x) {
+		//...
+		score i vars ++
+	}
+
+Essentially, every instance of { ... } gets turned into an mcfunction file,
+with the exception of RAW blocks @{ ... }@

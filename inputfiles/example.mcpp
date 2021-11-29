@@ -1,0 +1,80 @@
+namespace "mcpp_example";
+
+// line comment
+
+/*
+	block comment
+*/
+
+
+empty {
+	
+}
+
+sayHi {
+	/say oh hello there!;
+}
+
+rawBlock {
+	@{
+		say from a raw block
+		tellraw @a "yoyoyo!"
+		# mcfunction comment
+		scoreboard players set @s test 69
+		say @s's test score is now 69 lmao!
+	}@
+	
+	// the only processing of raw blocks is that the whitespace at the start of every line is removed.
+}
+
+rawBlock2 {
+	
+// Raw mcfunction can have very long lines,
+// so if you hate seeing it being indented,
+// then just, don't. 
+@{
+execute if score @p awake_time matches 216001..1800000 run summon phantom ~ ~ ~ {DeathLootTable:"spacephantoms:spacephantom", Size:15,Tags: ["processed"], Attributes: [{Base:35.0d, Name:generic.maxHealth}, {Base:1.6d, Name:"generic.movementSpeed"}, {Base:0.0d, Name:"generic.attackDamage"}], Passengers: [{id:"minecraft:cat", Tags: ["pacifier"], Team:"no_collision", NoAI:1b, Silent:1b, Invulnerable:1b, ActiveEffects: [{Ambient: 0b, ShowIcon: 1b, ShowParticles: 0b, Duration: 2147483647, Id: 14b, Amplifier: 0b}]}]}
+}@
+}
+
+multiline {
+	// but if your lines are THAT long...
+	// maybe consider doing a multiline command!
+
+	// multiline commands start with a / and end with a ;
+	// if you command contains switngs with a ; in them, those will be ignored.
+	// but, if there is a ; elsewhere you need to explicitly excape it with a backslash: \;
+
+	/execute if score @p awake_time matches 216001..1800000 // should comments work next to multiline commands?
+	run summon phantom ~ ~ ~
+	{
+		DeathLootTable:"spacephantoms:spacephantom", // I think they should
+		Size:15,
+		Tags: ["processed"],
+		Attributes: [
+			{Base:35.0d, Name:generic.maxHealth}, // I just noticed this Attr has no "quotes", what the heck??
+			{Base:1.6d, Name:"generic.movementSpeed"},
+			{Base:0.0d, Name:"generic.attackDamage"}
+		],
+		Passengers: [{
+			id:"minecraft:cat",
+			Tags: ["pacifier"],
+			Team:"no_collision",
+			NoAI:1b,
+			Silent:1b,
+			Invulnerable:1b,
+			ActiveEffects: [{
+				Ambient: 0b,
+				ShowIcon: 1b,
+				ShowParticles: 0b,
+				Duration: 2147483647,
+				Id: 14b,
+				Amplifier: 0b
+			}]
+		}]
+	}; /*
+	 ^
+	just don't forget the semicolon...
+	*/
+}
+

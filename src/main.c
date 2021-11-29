@@ -1,9 +1,11 @@
 #include "main.h"
 #include "lexer.h"
+#include "readFile.h" 
+
 
 #define EXIT_IF_ERROR(msg) do {	\
     if (msg != 0) { \
-      printf("[!] %s", msg); \
+      printf("[!] %s\n", msg); \
       return -1; \
     } \
   } while (0)
@@ -23,12 +25,15 @@ int real_main(int argc, char** args) {
   string_T fileContent = fileToStr(options.file, &error); // allocates the string, remember to free!
   EXIT_IF_ERROR(error);
 
-  token_T* tokens = lex(fileContent, &error); // lex prints its own errors
+  dataList_T tokens;
+  lex(fileContent, &tokens, &error);
+
   EXIT_IF_ERROR(error);
-  if (tokens == 0) {
-    printf("[!] Lexer Error.\n");
+  if (tokens.len == 0) {
+    printf("[!] Lexer generated 0 tokens.\n");
     return -1;
   }
+  
   
   // parse the tokens into intermediate representation
   //parse(tokens);
@@ -36,7 +41,8 @@ int real_main(int argc, char** args) {
   // intermediate representation to output files
   
   
-  free(fileContent.str);
+  free(fileContent.chars);
+  dataList_dispose(&tokens);
   return 0;
 }
 

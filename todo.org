@@ -1,0 +1,11 @@
+
+* TODO Lexing
+** DONE whitespace
+** DONE comments
+** TODO words
+   Function/namespace names must be [a-z0-9/._-]
+   ...so no capital letters!
+** TODO strings/contentblocks
+** TODO static symbols (operators, braces, etc.)
+
+* TODO Parsing

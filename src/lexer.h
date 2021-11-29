@@ -2,52 +2,31 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
+#include "simpleTypes.h"
+#include "datastructures.h"
+#include "token.h"
+#include "syntax.h"
 
-
-// does not have to be 0 terminated, can represent a subsection of a larger string.
-typedef struct STRING_STRUCT {
-  char* str;
-  size_t len;
-} string_T;
 
 typedef struct LEXER_STRUCT {
   string_T src;
   size_t i;
+  size_t line;
   char c;
 } lexer_T;
+void lexer_init(lexer_T* lexer, string_T src);
 
-typedef struct TOKEN_STRUCT {
-  enum {
-    TOKEN_KEYW_LOAD,
-    TOKEN_KEYW_TICK,
-    TOKEN_KEYW_FUNCTION,
-    TOKEN_KEYW_WHILE,
-    TOKEN_KEYW_IF,
-    TOKEN_KEYW_ELSE,
-    TOKEN_KEYW_NAMESPACE,
-    TOKEN_IDENTIFIER,
-    TOKEN_INT,
-    TOKEN_PLUS,
-    TOKEN_MINUS,
-    TOKEN_MULTIPLY,
-    TOKEN_DIVIDE,
-    TOKEN_OPEN_P, // parentheses
-    TOKEN_CLOSE_P,
-    TOKEN_OPEN_CB, // curly brace
-    TOKEN_CLOSE_CB,
-    TOKEN_STRING,
-    TOKEN_MULTILINE_CMD,
-    TOKEN_RAW_AREA
-  } type;
-  union {
-    string_T str;
-  } value;
-} token_T;
+void define_syntax();
+void lex(string_T src, dataList_T* tokens, char** error);
 
 
-string_T fileToStr(const char* fileName, char** errorMsg);
-size_t fileSize(FILE* file);
-bool strEq(const char* str1, const char* str2);
-
-token_T* lex(string_T src, char** error);
-void init(lexer_T* lexer, string_T src);
+#ifdef LEXER_FILE
+static void forward(lexer_T* lexer);
+static void forward_by(lexer_T* lexer, size_t offset);
+static char peek(lexer_T* lexer, size_t offset);
+static bool match_here(lexer_T* lexer, string_T* matcher);
+static void skip_until(lexer_T* lexer, string_T* str);
+static void skip_whitespace(lexer_T* lexer);
+static bool is_lowercase_letter(char c);
+#endif
