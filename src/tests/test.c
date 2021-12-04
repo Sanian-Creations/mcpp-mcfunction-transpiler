@@ -1,3 +1,4 @@
+#include "../macros.h"
 #include "../lexer.h"
 #include "../main.h"
 #include "../datastructures.h"
@@ -11,37 +12,39 @@ int tests_failed;
 #define TEST_START tests_run++
 #define FAIL(a, ...) do{tests_failed++;printf("[%d] "a"\n",tests_run,##__VA_ARGS__);return;}while(0)
 
-// static keyword means this function is only available from within this file
-// if it is #included elsewhere this function cannot be called.
-
 // TODO write some tests for datalist, similar to pointerList;
+// TODO write some tests for literally everything else, I've been ignoring these tests, haha
 
-
-
-static void test_pointerList_add_shouldResize(size_t initialCapacity) {
+static void test_pointerList_0capacity() {
   TEST_START;
-  
-  int kek = 101;
-  pointerList_T list;
-  pointerList_init(&list, initialCapacity);
-  list.len = initialCapacity;
-  pointerList_add(&list, &kek);
 
-  if (list.capacity != initialCapacity*2) {
-    pointerList_dispose(&list);
-    FAIL("pointerList_add: Capacity should be %d after resizing from %d", initialCapacity*2, initialCapacity);
-  }
+  // arrange
+  pointerList_T list;
+  list.arr = (void*)0xFFFFFFFF; // some non-null pointer
+
+  // act
+  pointerList_init(&list, 0);
+  void* actual_arr = list.arr;
   pointerList_dispose(&list);
+  
+  // assert
+  if (actual_arr != NULL) {
+    FAIL("pointerList_init: 0 capacity should set 'arr' to NULL");
+  }
 }
 
-static void test_pointerList_add() {
+static void test_pointerList_add_one_item() {
   TEST_START;
 
+  // arrange
   int kek = 101;
   pointerList_T list;
   pointerList_init(&list, 2);
+
+  // act
   pointerList_add(&list, &kek);
-  
+
+  // assert
   if (list.arr == NULL) {
     pointerList_dispose(&list);
     FAIL("pointerList_add: list.arr shouldn't be NULL after inserting one item");
@@ -57,64 +60,98 @@ static void test_pointerList_add() {
   pointerList_dispose(&list);
 }
 
-static void test_pointerList_0capacity() {
+static void test_pointerList_add_shouldResize(size_t initialCapacity) {
   TEST_START;
 
+  // arrange
+  size_t expected = initialCapacity * 2;
   pointerList_T list;
-  list.arr = (void*)0xFFFFFFFF; // some non-null pointer
-  
-  pointerList_init(&list, 0);
-  
-  if (list.arr != NULL) {
-    pointerList_dispose(&list);
-    FAIL("pointerList_init: 0 capacity should set 'arr' to NULL");
+  pointerList_init(&list, initialCapacity);
+  list.len = initialCapacity;
+  int nice = 69;
+
+  // act
+  pointerList_add(&list, &nice);
+  size_t actual = list.capacity;
+  pointerList_dispose(&list); // no leaks!
+
+  // assert
+  if (actual != expected) {
+    FAIL("pointerList_add: Capacity should be %"SIZE_T_FORMAT" after resizing from %"SIZE_T_FORMAT", but was", initialCapacity*2, initialCapacity);
   }
-  pointerList_dispose(&list);
 }
 
-static void test_pointerList() {
+static void test_pointerList_cases() {
   test_pointerList_0capacity();
-  test_pointerList_add();
+  test_pointerList_add_one_item();
   test_pointerList_add_shouldResize(2);
   test_pointerList_add_shouldResize(5);
   test_pointerList_add_shouldResize(69);
 }
 
 
-static void test_parseArgs_(int argc, char** args, bool shouldSucceed) {
+static void test_string_match(char* arg1, char* arg2, bool expected) {
   TEST_START;
-  // TODO once we have some flags, add teststo see if the options struct is as expected
 
+  // arrange
+  string_T str1, str2;
+  string_init(&str1, arg1);
+  string_init(&str2, arg2);
+
+  // act
+  bool result = string_match(&str1, &str2);
+
+  // assert
+  if (result != expected) {
+    FAIL("string_match: |%s| should %sbe equal to |%s|\n", arg1, expected ? "" : "not ", arg2);
+  }
+}
+
+static void test_string_match_cases(){
+  test_string_match("",     "",    true);
+  test_string_match("yo",   "yo",  true);
+  test_string_match("abc",  "bca", false);
+  test_string_match("abc",  "abd", false);
+  test_string_match("aaaa", "aa",  false);
+}
+
+
+static void test_parseArgs(int argc, char** args, bool shouldSucceed) {
+  TEST_START;
+  // TODO once we have some flags, add tests to see if the options struct is as expected
+
+  // arrange
   char* error;
   argOptions_T options = {0};
-  
+
+  // act
   parseArgs(argc, args, &options, &error);
   bool succeeded = error == 0;
 
+  // assert
   if (succeeded != shouldSucceed){
     if (shouldSucceed) {
       FAIL("parseArgs: should succeed when given %d argument(s), instead it gave this error: \n\t%s", argc, error);
-    } else { 
+    } else {
       FAIL("parseArgs: should not succeed when given %d argument(s)", argc);
     }
   }
 }
 
-static void test_parseArgs() {
-  
+static void test_parseArgs_cases() {
+
   char* args[] = {"mcpp.exe", "someFile.txt", "-f", "-o", "outputName"};
-  
-  test_parseArgs_(0, args, false); // too few args
-  test_parseArgs_(1, args, false); // too few args
-  test_parseArgs_(2, args, true);
-  test_parseArgs_(3, args, false); // too many args
+
+  test_parseArgs(0, args, false); // too few args
+  test_parseArgs(1, args, false); // too few args
+  test_parseArgs(2, args, true);
+  test_parseArgs(3, args, false); // too many args
 }
 
-
-
 int main() {
-  test_parseArgs();
-  test_pointerList();
+  test_parseArgs_cases();
+  test_pointerList_cases();
+  test_string_match_cases();
   
   printf("RESULT: [%d/%d] tests succeeded.\n", tests_run - tests_failed, tests_run);
   fflush(stdout);

@@ -1,7 +1,4 @@
 #include "main.h"
-#include "lexer.h"
-#include "readFile.h" 
-
 
 #define EXIT_IF_ERROR(msg) do {	\
     if (msg != 0) { \
@@ -13,7 +10,7 @@
 
 int real_main(int argc, char** args) {
 
-  printf("\n-----------------------\nRunning mc++ transpiler\n-----------------------\n");
+  printf("\n-----------------------\nRunning mc++ transpiler\n-----------------------\n\n");
   fflush(stdout);
   
   char* error;
@@ -27,12 +24,13 @@ int real_main(int argc, char** args) {
 
   dataList_T tokens;
   lex(fileContent, &tokens, &error);
-
-  EXIT_IF_ERROR(error);
-  if (tokens.len == 0) {
-    printf("[!] Lexer generated 0 tokens.\n");
-    return -1;
+  // DEBUG
+  printf("Generated %"SIZE_T_FORMAT" tokens\n", tokens.len);
+  for (size_t i = 0; i < tokens.len; i++) {
+    printf("Token %u\n", ((token_T*)tokens.arr)[i].type);
   }
+  // /DEBUG
+  EXIT_IF_ERROR(error);
   
   
   // parse the tokens into intermediate representation

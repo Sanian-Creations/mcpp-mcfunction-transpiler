@@ -1,8 +1,10 @@
 MAKEFLAGS += --no-builtin-rules
 
 CC := gcc
-CFLAGS := -Wall -Werror -Wextra -Wno-unused-function
 RELEASEFLAGS := -O3
+DEBUGFLAGS := -g -Wno-unused-function
+CFLAGS := -Wall -Werror -Wextra $(DEBUGFLAGS)
+
 
 src_dir := src
 obj_dir := obj
@@ -34,7 +36,7 @@ $(dirs):
 
 # test stuff
 $(test_exec): $(dirs) $(objects) $(test_objects)
-	$(CC)  $(CFLAGS) $(test_objects) $(objects_without_entrypoint) -o $@
+	$(CC) $(CFLAGS) $(test_objects) $(objects_without_entrypoint) -o $@
 
 $(test_obj_dir)/%.o: $(test_src_dir)/%.c $(test_src_dir)/%.h
 	$(CC) $(CFLAGS) $< -c -o $@
@@ -43,13 +45,13 @@ $(test_obj_dir)/%.o: $(test_src_dir)/%.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
 # make commands
-.PHONY: clean rebuild release run anyway objects tests runtests cleantests temp _release_settings _ignore_warnings
+.PHONY: clean rebuild release run anyway objects tests runtests cleantests temp _release_settings _ignore_warnings _rebuild_all_objects _test_settings
 
 clean:
 	-rm $(obj_dir)/*.o
 	-rm $(target_exec)
 
-rebuild: clean $(target_exec)
+rebuild: clean _rebuild_all_objects $(target_exec)
 
 release: _release_settings rebuild
 
@@ -58,10 +60,9 @@ run: $(target_exec)
 
 anyway: _ignore_warnings $(target_exec)
 
-
 objects: $(dirs) $(objects) # just makes the object files without making the executable
 
-tests: $(test_exec)
+tests: _test_settings $(test_exec)
 
 runtests: tests
 	$(test_exec)
@@ -71,7 +72,13 @@ cleantests:
 	-rm $(test_exec)
 
 _release_settings:
-	$(eval CFLAGS += $(RELEASEFLAGS))
+	$(eval CFLAGS := $(RELEASEFLAGS) $(filter-out $(DEBUGFLAGS), $(CFLAGS)))
 
 _ignore_warnings:
 	$(eval CFLAGS := $(filter-out -Werror -Wall -Wextra, $(CFLAGS)))
+
+_rebuild_all_objects: # makes rebuild a lot faster by calling gcc only once
+	cd $(obj_dir) && $(CC) $(CFLAGS) $(addprefix ../, $(sources)) -c
+
+_test_settings: # For tests particularly, I want to know if I forgot to call one
+	$(eval CFLAGS += -Wunused-function -Werror)

@@ -2,10 +2,20 @@
 * TODO Lexing
 ** DONE whitespace
 ** DONE comments
-** TODO words
+** DONE words
+** TODO identifiers
    Function/namespace names must be [a-z0-9/._-]
    ...so no capital letters!
-** TODO strings/contentblocks
+   
+** TODO strings
+*** DONE detect strings
+*** TODO unescape string content
+    
+** TODO contentblocks
+*** TODO detect content blocks
+*** TODO remove preceding whitespace from each line
+    
 ** TODO static symbols (operators, braces, etc.)
+
 
 * TODO Parsing

@@ -16,7 +16,12 @@ string_T fileToStr(const char* fileName, char** error) {
   }
   
   content.len = fileSize(f);
-  content.chars = malloc((content.len+1) * sizeof(char)); // +1 for '\0' on the end
+  content.chars = malloc((content.len+1) * sizeof(char));
+  // allocating len+1 for a '\0' on the end.
+  // This is partly for printing purposes, but also
+  // because (at the time of writing this) the lexer
+  // actually reads the char at src[src.len]
+  // before checking if it's reached the end.
 
   if (content.chars == NULL) {
     *error = "Couldn't allocate space for the file.";

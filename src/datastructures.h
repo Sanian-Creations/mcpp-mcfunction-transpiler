@@ -31,5 +31,6 @@ void dataList_dispose(dataList_T* list);
 // that you can't just forget to cast when using this macro
 #define DATALIST_VAL_GET(l, i) ((void*)(l.arr + (i * l.elemSize)))
 #define DATALIST_REF_GET(l, i) ((void*)(l->arr + (i * l->elemSize)))
+#define DATALIST_REF_LAST(l) DATALIST_REF_GET(l, (l->len-1))
 
 // ----
