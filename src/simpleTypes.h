@@ -1,7 +1,6 @@
 #pragma once
-#include <string.h>
+#include <stddef.h>
 #include <stdbool.h>
-#include <stdio.h>
 
 // does not have to be 0 terminated, can represent a subsection of a larger string.
 typedef struct STRING_STRUCT {

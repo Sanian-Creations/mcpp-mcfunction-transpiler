@@ -50,3 +50,9 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+
+# Custom ignores specific to this project:
+build/
+obj/
+*.log

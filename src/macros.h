@@ -8,6 +8,8 @@
   
   Anyways, having to modify all strings in the project just to be able to use a different compiler is bothersome. So, if anyone else ever compiles this with 32bit, I want to save you the trouble of having to do that.
 
+  If I did everything right, then this file should make it so that you can compile this with either a 64 bit or 32 bit compiler, the format used to print size_t dynamically adjusts itself to the environment.
+
 */
 
 // https://stackoverflow.com/questions/1505582/determining-32-vs-64-bit-in-c

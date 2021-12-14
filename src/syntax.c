@@ -1,5 +1,23 @@
 #define SYNTAX_FILE
+#include <stdio.h>
 #include "syntax.h"
+#include "token.h"
+void exit(int status);
+
+
+static void define_keyword(char* word, token_E token_type);
+static void define_comment(char* start, char* end, bool eof_terminated);
+
+static size_t keyword_count = 0;
+static size_t comment_count = 0;
+comment_definition_T comments[2]; // ! remember to export
+keyword_definition_T keywords[8];
+const size_t comments_len = sizeof(comments) / sizeof(comment_definition_T);
+const size_t keywords_len = sizeof(keywords) / sizeof(keyword_definition_T);
+
+bool is_syntax_defined = false;
+
+
 
 static void no_space_for(char* definition_type) {
   printf("[DEVELOPER_SUCKS_ERROR] Not enough space to store that many %s definitions, please modify the size of the %ss array\n", definition_type, definition_type);

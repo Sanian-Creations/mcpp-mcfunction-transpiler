@@ -2,8 +2,8 @@ MAKEFLAGS += --no-builtin-rules
 
 CC := gcc
 RELEASEFLAGS := -O3
-DEBUGFLAGS := -g -Wno-unused-function
-CFLAGS := -Wall -Werror -Wextra $(DEBUGFLAGS)
+DEBUGFLAGS := -g
+CFLAGS := -Wall -Werror -Wextra -Wno-unused-function -Wno-unused-parameter $(DEBUGFLAGS)
 
 
 src_dir := src
@@ -13,13 +13,14 @@ test_src_dir := $(src_dir)/tests
 test_obj_dir := $(obj_dir)/tests
 dirs := $(src_dir) $(obj_dir) $(build_dir) $(test_src_dir) $(test_obj_dir)
 target_exec := $(build_dir)/mcpp.exe
-test_exec := $(build_dir)/runtests.exe
 
 sources := $(wildcard $(src_dir)/*.c)
 objects := $(addprefix $(obj_dir)/, $(notdir $(sources:.c=.o)))
-test_sources := $(wildcard $(test_src_dir)/*.c)
-test_objects := $(addprefix $(test_obj_dir)/, $(notdir $(test_sources:.c=.o)))
 objects_without_entrypoint := $(filter-out $(obj_dir)/entrypoint.o, $(objects))
+test_sources := $(wildcard $(test_src_dir)/test_*.c)
+test_objects := $(addprefix $(test_obj_dir)/, $(notdir $(test_sources:.c=.o)))
+test_execs := $(addprefix $(build_dir)/, $(notdir $(test_sources:.c=.exe)))
+
 
 # main stuff
 $(target_exec): $(dirs) $(objects)
@@ -62,14 +63,15 @@ anyway: _ignore_warnings $(target_exec)
 
 objects: $(dirs) $(objects) # just makes the object files without making the executable
 
-tests: _test_settings $(test_exec)
+# Run all the test executables by concatenating them with &&
+runtests: $(objects_without_entrypoint) _test_settings $(test_execs)
+	$(firstword $(test_execs)) $(addprefix && , $(wordlist 2, $(words $(test_execs)),$(test_execs)))
 
-runtests: tests
-	$(test_exec)
+$(build_dir)/test_%.exe: $(src_dir)/%.c
+	$(CC) $(test_src_dir)/test_$*.c $(filter-out $(obj_dir)/$*.o, $(objects_without_entrypoint)) $(CFLAGS) -o $@
 
 cleantests:
-	-rm $(test_obj_dir)/*.o
-	-rm $(test_exec)
+	-rm $(build_dir)/test_*.exe
 
 _release_settings:
 	$(eval CFLAGS := $(RELEASEFLAGS) $(filter-out $(DEBUGFLAGS), $(CFLAGS)))
@@ -82,3 +84,7 @@ _rebuild_all_objects: # makes rebuild a lot faster by calling gcc only once
 
 _test_settings: # For tests particularly, I want to know if I forgot to call one
 	$(eval CFLAGS += -Wunused-function -Werror)
+
+
+
+

@@ -1,4 +1,6 @@
 #include "simpleTypes.h"
+#include <stdio.h>
+#include <string.h>
 
 void string_init(string_T* string, char* chars) {
   string->chars = chars;

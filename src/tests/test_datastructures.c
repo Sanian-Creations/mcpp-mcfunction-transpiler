@@ -1,16 +1,6 @@
 #include "../macros.h"
-#include "../lexer.h"
-#include "../main.h"
-#include "../datastructures.h"
-#include <stdbool.h>
-#include <string.h>
-#include <stdio.h>
-
-int tests_run;
-int tests_failed;
-
-#define TEST_START tests_run++
-#define FAIL(a, ...) do{tests_failed++;printf("[%d] "a"\n",tests_run,##__VA_ARGS__);return;}while(0)
+#include "../datastructures.c"
+#include "sanian_unit.h"
 
 // TODO write some tests for datalist, similar to pointerList;
 // TODO write some tests for literally everything else, I've been ignoring these tests, haha
@@ -90,69 +80,9 @@ static void test_pointerList_cases() {
 }
 
 
-static void test_string_match(char* arg1, char* arg2, bool expected) {
-  TEST_START;
-
-  // arrange
-  string_T str1, str2;
-  string_init(&str1, arg1);
-  string_init(&str2, arg2);
-
-  // act
-  bool result = string_match(&str1, &str2);
-
-  // assert
-  if (result != expected) {
-    FAIL("string_match: |%s| should %sbe equal to |%s|\n", arg1, expected ? "" : "not ", arg2);
-  }
-}
-
-static void test_string_match_cases(){
-  test_string_match("",     "",    true);
-  test_string_match("yo",   "yo",  true);
-  test_string_match("abc",  "bca", false);
-  test_string_match("abc",  "abd", false);
-  test_string_match("aaaa", "aa",  false);
-}
-
-
-static void test_parseArgs(int argc, char** args, bool shouldSucceed) {
-  TEST_START;
-  // TODO once we have some flags, add tests to see if the options struct is as expected
-
-  // arrange
-  char* error;
-  argOptions_T options = {0};
-
-  // act
-  parseArgs(argc, args, &options, &error);
-  bool succeeded = error == 0;
-
-  // assert
-  if (succeeded != shouldSucceed){
-    if (shouldSucceed) {
-      FAIL("parseArgs: should succeed when given %d argument(s), instead it gave this error: \n\t%s", argc, error);
-    } else {
-      FAIL("parseArgs: should not succeed when given %d argument(s)", argc);
-    }
-  }
-}
-
-static void test_parseArgs_cases() {
-
-  char* args[] = {"mcpp.exe", "someFile.txt", "-f", "-o", "outputName"};
-
-  test_parseArgs(0, args, false); // too few args
-  test_parseArgs(1, args, false); // too few args
-  test_parseArgs(2, args, true);
-  test_parseArgs(3, args, false); // too many args
-}
-
 int main() {
-  test_parseArgs_cases();
   test_pointerList_cases();
-  test_string_match_cases();
-  
+    
   printf("RESULT: [%d/%d] tests succeeded.\n", tests_run - tests_failed, tests_run);
   fflush(stdout);
 }

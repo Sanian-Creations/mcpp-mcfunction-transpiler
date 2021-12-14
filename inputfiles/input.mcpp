@@ -1,32 +1,38 @@
-	
+namespace "cool pack";
 
-while/**/else //while
-if
-// something is here, weird
+func haha {
 
+     /say hi;
 
+     /tellraw @a {"text":
+	"I wanted to write
+	a very long string today
+	with many newlines"
+     };
 
+     /execute as @a[tag=lmao] at @s
+        if entity @e[type=armor_stand,distance=..5] // there's a comment here now
+	if score @s temp matches 69        // comments should be ignored
+	store result score name objective // placing a ; here should not matter!
+	/*a comment like this
+	    should be
+	fine too */
+	run say "yoyoyo"; // also, removing this ; should cause an error, it shouldn't assume the command stops at line 28
 
-// another weird thing just happened
-   	   	  
-/* multiline comment...... */         
+     if (something) {
+     	kek
+     } else {
+        not kek
+     }
+}
 
+func ohnoes {
 
-this is an input file
-load tick /* hahahaha*/ func
-// namespace
-function namespace
-the text isnt anything just jet
+     /say there's a raw block here!;
 
-/*
-	forbidden %$ characters #^&
-	are fine, as l0ng as You Put THEM
-	IN a ©omment
-*/
-
-"tp"if"hahaha!" "woowow"
-"newline\ntab\twowie"
-
-
-
-function if while
+     @{
+	  say 'suh
+	  # mcfunction comment
+	  scoreboard players set @s nice 69
+     }@
+}

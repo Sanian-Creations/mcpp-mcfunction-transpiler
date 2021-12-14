@@ -1,5 +1,5 @@
 #include "datastructures.h"
-
+#include "safe_allocation.h"
 
 /*
   POINTER LIST
@@ -14,14 +14,13 @@ void pointerList_init(pointerList_T* list, size_t capacity) {
     return;
   }
   
-  list->arr = malloc(capacity * sizeof(void*));
+  list->arr = safe_malloc(capacity * sizeof(void*));
 }
 
 void pointerList_add(pointerList_T* list, void* elem) {
   if (list->len >= list->capacity) { // resize required
     list->capacity *= 2;
-    list->arr = realloc(list->arr, list->capacity * sizeof(void*));
-    if (list->arr == NULL) return;
+    list->arr = safe_realloc(list->arr, list->capacity * sizeof(void*));
   }
   
   list->arr[list->len++] = elem;
@@ -52,7 +51,7 @@ void dataList_init(dataList_T* list, size_t capacity, size_t elemSize){
     return;
   }
   
-  list->arr = malloc(capacity * elemSize);
+  list->arr = safe_malloc(capacity * elemSize);
 }
 
 
@@ -63,8 +62,7 @@ void* dataList_add(dataList_T* list) {
   
   if (list->len >= list->capacity) { // resize required
     list->capacity *= 2;
-    list->arr = realloc(list->arr, list->capacity * list->elemSize);
-    if (list->arr == NULL) return 0;
+    list->arr = safe_realloc(list->arr, list->capacity * list->elemSize);
   }
   
   return DATALIST_REF_GET(list, list->len++);
@@ -72,5 +70,5 @@ void* dataList_add(dataList_T* list) {
 
 void dataList_dispose(dataList_T* list) {
   free(list->arr);
-  list->arr = NULL; // clean mem pointer
+  list->arr = 0; // clean mem pointer
 }

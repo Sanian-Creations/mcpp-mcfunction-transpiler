@@ -1,21 +1,43 @@
-
+* TODO Input
+** DONE single file
+** TODO multiple files
+   when multiple files are being read at the same time they should probably be mutltithreaded.
+** TODO flags
+*** TODO (optional) output directory
+*** TODO (optional) input directory
+* TODO Output
+** TODO get output-location
+*** TODO take inputflag
+*** TODO if no inputflag, use current dir if it's a datapack folder
+    - get current working directory (getcwd() in unistd.h)
+    - traverse up the directory until ".minecraft" is hit. (error if not)
+    - traverse back to make sure we're inside a datapack folder (error if not):
+      "<wherever>\.minecraft\saves\WorldName\datapacks\PackName\<anywhere_but_data>"
+      (error if not)
+** TODO datapack generation
+** TODO simple file/directory interface
+   making files and directories is kind of bothersome and platform dependent
+   It would probably help to have a common interface for it.
+*** TODO Windows implementation
+*** TODO Linux implementation
 * TODO Lexing
 ** DONE whitespace
 ** DONE comments
 ** DONE words
 ** TODO identifiers
    Function/namespace names must be [a-z0-9/._-]
-   ...so no capital letters!
-   
+   So no capital letters!
 ** TODO strings
 *** DONE detect strings
 *** TODO unescape string content
-    
-** TODO contentblocks
-*** TODO detect content blocks
-*** TODO remove preceding whitespace from each line
-    
+** DONE contentblocks
+*** DONE detect content blocks    
+*** DONE remove preceding whitespace from each line
 ** TODO static symbols (operators, braces, etc.)
-
-
 * TODO Parsing
+* DONE Safe Allocation
+  safe allocation functions should exit when the underlying function returns NULL
+** DONE safe malloc
+** DONE safe calloc
+** DONE safe realloc
+** DONE replace all current __alloc functions with their safe counterparts

@@ -59,14 +59,31 @@ a line still needs to end with ';' because this allows multi-line commands which
 	  run say "yoyoyo";
 
 
-alternatively, a 'raw' block pastes its content directly into the resulting files.
-it's content isn't checked, so if you make a mistake you'll have to figure that out yourself!
+What if you wanted to have strings in your multiline commands, when using tellraw for example? Sure thing.
+when your command contains strings, all newlines within strings will get translated back into "\n",
+and the whitespace at the start of a new line will get trimmed, so don't worry about indentation
+screwing up the content.
+
+	/tellraw @a {"text":
+	  "I wanted to write
+	  a very long string today
+	  with many newlines"
+	};
+	
+Gets converted to:
+
+	tellraw @a {"text":"I wanted to write\na very long string today\nwith many newlines"}
+
+If the language still somehow prevents you from writing the command you wanted, you can still write
+good ol' mcfunction by using a 'raw-block'. A raw-block pastes its content directly into the
+resulting files, apart from the whitespace at the start of each line (again, don't worry about indentation).
+Other than that, it's content isn't checked, so if you make a mistake you'll have to
+figure that out yourself!
 
 	@{
-		say hi
-		tellraw @a "yoyoyo!"
-		# mcfunction comment
-		scoreboard players set @s temp 69
+	  say 'suh
+	  # mcfunction comment
+	  scoreboard players set @s nice 69
 	}@
 
 
@@ -143,60 +160,60 @@ Some way to make tellraw text a little easier. From this:
 
 	tellraw @s ["",{"text": "RequiredPlayerRange","color": "aqua"},": ",{"score": {"name": "RequiredPlayerRange","objective": "SCspawnerData"},"color": "gold"},{"text": "s ","color": "red"},{"text": "[Change]","color": "light_purple","hoverEvent": {"action": "show_text","value": "§bRequiredPlayerRange"},"clickEvent": {"action": "run_command","value": "/function sc_edit_spawners:input/place_input/requiredplayerrange_attempt"}}]
 
-to something along the lines of this:
+To something more readable, but honestly none of the below ideas seem very appealing to me
 
-// stylesheets?
-style {
- _ {},
- a {color: aqua},
- s {color: red},
- g {color: gold},
- c {
-    color: light_purple,
-    click {
-       hoverEvent {
-         action: show_text,
-         value: §bRequiredPlayerRange
-       },
-       clickEvent {
-         action: run_command,
-         value: /function sc_edit_spawners:input/place_input/requiredplayerrange_attempt
-       }
-     }
-   }
-}
-
-// this	
-tellraw @s f"%aRequiredPlayerRange%_: %g%{score(RequiredPlayerRange, SCspawnerData)}%ss %lp[Change]"
-
-// or for the most clarity: just typing the string and adding colour some other way
-tellraw @s {
-	"RequiredPlayerRange: %s [Change]"
-	"^                  ^ ^^ ^"
-	"a                  _ gs c"
-}
-
-// or this
-a  "RequiredPlayerRange",
-_  ": ",
-g  score(RequiredPlayerRange, SCspawnerData),
-s  "s ",
-c "[Change]"
-
-
-// or this
-a>"RequiredPlayerRange", ": ", g>score(RequiredPlayerRange, SCspawnerData), s>"s ", c>"[Change]"
-
-
-// or this
-a="RequiredPlayerRange",
-": ",
-g=score(RequiredPlayerRange, SCspawnerData),
-s="s ",
-c="[Change]"
-
-
-// maybe, this
-tellraw @s (
-	"RequiredPlayerRange".a, ": ", score(RequiredPlayerRange, SCspawnerData).g, "s ".s, "[Change]".c
-)
+	// stylesheets?
+	style {
+	 _ {},
+	 a {color: aqua},
+	 s {color: red},
+	 g {color: gold},
+	 c {
+	    color: light_purple,
+	    click {
+	       hoverEvent {
+	         action: show_text,
+	         value: §bRequiredPlayerRange
+	       },
+	       clickEvent {
+	         action: run_command,
+	         value: /function sc_edit_spawners:input/place_input/requiredplayerrange_attempt
+	       }
+	     }
+	   }
+	}
+	
+	// this	
+	tellraw @s f"%aRequiredPlayerRange%_: %g%{score(RequiredPlayerRange, SCspawnerData)}%ss %lp[Change]"
+	
+	// or for the most clarity: just typing the string and adding colour some other way
+	tellraw @s {
+		"RequiredPlayerRange: %s [Change]"
+		"^                  ^ ^^ ^"
+		"a                  _ gs c"
+	}
+	
+	// or this
+	a  "RequiredPlayerRange",
+	_  ": ",
+	g  score(RequiredPlayerRange, SCspawnerData),
+	s  "s ",
+	c "[Change]"
+	
+	
+	// or this
+	a>"RequiredPlayerRange", ": ", g>score(RequiredPlayerRange, SCspawnerData), s>"s ", c>"[Change]"
+	
+	
+	// or this
+	a="RequiredPlayerRange",
+	": ",
+	g=score(RequiredPlayerRange, SCspawnerData),
+	s="s ",
+	c="[Change]"
+	
+	
+	// maybe, this
+	tellraw @s (
+		"RequiredPlayerRange".a, ": ", score(RequiredPlayerRange, SCspawnerData).g, "s ".s, "[Change]".c
+	)

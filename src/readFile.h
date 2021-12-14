@@ -1,7 +1,6 @@
 #pragma once
-#include <stdlib.h>
-#include <stdio.h>
 #include "simpleTypes.h" 
+#include <stdio.h>
 
-string_T fileToStr(const char* fileName, char** errorMsg);
-size_t fileSize(FILE* file);
+string_T file_to_string(const char* fileName, char** errorMsg);
+size_t file_size(FILE* file);
