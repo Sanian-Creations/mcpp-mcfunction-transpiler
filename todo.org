@@ -41,3 +41,5 @@
 ** DONE safe calloc
 ** DONE safe realloc
 ** DONE replace all current __alloc functions with their safe counterparts
+* TODO Misc
+** DONE make string_equals use memcmp instead of doing it manually, apparently memory alignment can cause issues with what I'm doing now.
